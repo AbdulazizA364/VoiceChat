@@ -28,7 +28,6 @@ import net.gliby.voicechat.common.networking.packets.MinecraftClientVoiceServerP
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import sun.util.logging.resources.logging;
 
 public class ServerConnectionHandler {
 

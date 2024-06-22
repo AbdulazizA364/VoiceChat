@@ -11,6 +11,7 @@ import net.gliby.voicechat.common.VoiceChatServer;
 import net.gliby.voicechat.common.api.VoiceChatAPI;
 import net.gliby.voicechat.common.api.events.ServerStreamEvent;
 import net.gliby.voicechat.common.networking.entityhandler.EntityHandler;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
@@ -61,7 +62,7 @@ public class ServerStreamManager {
 
 	/**
 	 * Transfers stream data to all players.
-	 * 
+	 *
 	 * @param stream
 	 * @param voiceData
 	 */
@@ -88,7 +89,7 @@ public class ServerStreamManager {
 
 	/**
 	 * * Transfers stream data to specific player.
-	 * 
+	 *
 	 * @param stream
 	 * @param voiceData
 	 * @param target
@@ -109,26 +110,26 @@ public class ServerStreamManager {
 	/**
 	 * Transfers stream data to all players within the same world as the
 	 * speaker.
-	 * 
+	 *
 	 * @param stream
 	 * @param voiceData
 	 */
 	public void feedStreamToWorld(ServerStream stream, ServerDatalet voiceData) {
 		final EntityPlayerMP speaker = voiceData.player;
-		final List<EntityPlayerMP> players = speaker.worldObj.playerEntities;
+		final List<EntityPlayer> players = speaker.worldObj.playerEntities;
 		if (voiceData.end) {
 			for (int i = 0; i < players.size(); i++) {
-				final EntityPlayerMP target = players.get(i);
+				final EntityPlayer target = players.get(i);
 				if (target.getEntityId() != speaker.getEntityId()) {
-					if (voiceChat.getVoiceServer() != null && target != null) voiceChat.getVoiceServer().sendVoiceEnd(target, stream.id);
+					if (voiceChat.getVoiceServer() != null && target != null) voiceChat.getVoiceServer().sendVoiceEnd((EntityPlayerMP) target, stream.id);
 				}
 			}
 		} else {
 			for (int i = 0; i < players.size(); i++) {
-				final EntityPlayerMP target = players.get(i);
+				final EntityPlayer target = players.get(i);
 				if (target.getEntityId() != speaker.getEntityId()) {
-					entityHandler.whileSpeaking(stream, speaker, target);
-					voiceChat.getVoiceServer().sendChunkVoiceData(target, voiceData.id, false, voiceData.data, voiceData.divider, voiceData.volume);
+					entityHandler.whileSpeaking(stream, speaker, (EntityPlayerMP) target);
+					voiceChat.getVoiceServer().sendChunkVoiceData((EntityPlayerMP) target, voiceData.id, false, voiceData.data, voiceData.divider, voiceData.volume);
 				}
 			}
 		}
@@ -136,7 +137,7 @@ public class ServerStreamManager {
 
 	/**
 	 * Transfers stream data to players within distance of speaker.
-	 * 
+	 *
 	 * @param stream
 	 * @param voiceData
 	 * @param distance
@@ -145,32 +146,32 @@ public class ServerStreamManager {
 	 */
 	public void feedWithinEntityWithRadius(ServerStream stream, ServerDatalet voiceData, int distance) {
 		final EntityPlayerMP speaker = stream.player;
-		final List<EntityPlayerMP> players = speaker.worldObj.playerEntities;
+		final List<EntityPlayer> players = speaker.worldObj.playerEntities;
 		if (voiceData.end) {
 			for (int i = 0; i < players.size(); i++) {
-				final EntityPlayerMP target = players.get(i);
+				final EntityPlayer target = players.get(i);
 				if (target.getEntityId() != speaker.getEntityId()) {
 					final double d4 = speaker.posX - target.posX;
 					final double d5 = speaker.posY - target.posY;
 					final double d6 = speaker.posZ - target.posZ;
 					if (d4 * d4 + d5 * d5 + d6 * d6 < distance * distance) {
-						if (voiceChat.getVoiceServer() != null && target != null) voiceChat.getVoiceServer().sendVoiceEnd(target, stream.id);
+						if (voiceChat.getVoiceServer() != null && target != null) voiceChat.getVoiceServer().sendVoiceEnd((EntityPlayerMP) target, stream.id);
 					}
 				}
 			}
 		} else {
 			for (int i = 0; i < players.size(); i++) {
-				final EntityPlayerMP target = players.get(i);
+				final EntityPlayer target = players.get(i);
 				if (target.getEntityId() != speaker.getEntityId()) {
 					final double d4 = speaker.posX - target.posX;
 					final double d5 = speaker.posY - target.posY;
 					final double d6 = speaker.posZ - target.posZ;
 					final double distanceBetween = d4 * d4 + d5 * d5 + d6 * d6;
 					if (distanceBetween < distance * distance) {
-						entityHandler.whileSpeaking(stream, speaker, target);
-						voiceChat.getVoiceServer().sendChunkVoiceData(target, voiceData.id, true, voiceData.data, voiceData.divider, voiceData.volume);
+						entityHandler.whileSpeaking(stream, speaker, (EntityPlayerMP) target);
+						voiceChat.getVoiceServer().sendChunkVoiceData((EntityPlayerMP) target, voiceData.id, true, voiceData.data, voiceData.divider, voiceData.volume);
 						if (stream.tick % voiceChat.serverSettings.positionUpdateRate == 0) {
-							if (distanceBetween > 64 * 64) voiceChat.getVoiceServer().sendEntityPosition(target, speaker.getEntityId(), speaker.posX, speaker.posY, speaker.posZ);
+							if (distanceBetween > 64 * 64) voiceChat.getVoiceServer().sendEntityPosition((EntityPlayerMP) target, speaker.getEntityId(), speaker.posX, speaker.posY, speaker.posZ);
 							stream.tick = 0;
 						}
 						stream.tick++;

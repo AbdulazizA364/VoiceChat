@@ -10,6 +10,7 @@ import net.gliby.voicechat.common.api.events.ServerStreamEvent;
 import net.gliby.voicechat.common.networking.ServerDatalet;
 import net.gliby.voicechat.common.networking.ServerStream;
 import net.gliby.voicechat.common.networking.ServerStreamManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -34,16 +35,16 @@ public class ExampleStreamHandlerAroundPosition {
 	 * @param distance Distance should be the same as the distance in voice chat settings, otherwise it will stream globally.
 	 */
 	public void feedStreamPositionWithRadius(ServerStreamManager streamManager, ServerStream stream, ServerDatalet voiceData, World world, double x, double y, double z, int distance) {
-		final EntityPlayerMP speaker = stream.player;
-		final List<EntityPlayerMP> players = world.playerEntities;
+		final EntityPlayer speaker = stream.player;
+		final List<EntityPlayer> players = world.playerEntities;
 		for (int i = 0; i < players.size(); i++) {
-			final EntityPlayerMP target = players.get(i);
+			final EntityPlayer target = players.get(i);
 			if(target.getEntityId() != speaker.getEntityId()) {
 				final double d4 = x - target.posX;
 				final double d5 = y - target.posY;
 				final double d6 = z - target.posZ;
 				if (d4 * d4 + d5 * d5 + d6 * d6 < distance * distance) {
-					streamManager.feedStreamToPlayer(stream, voiceData, target, distance == VoiceChat.getServerInstance().getServerSettings().getSoundDistance());
+					streamManager.feedStreamToPlayer(stream, voiceData, (EntityPlayerMP) target, distance == VoiceChat.getServerInstance().getServerSettings().getSoundDistance());
 				}
 			}
 		}
